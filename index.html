@@ -1,0 +1,147 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>localStorage Manager</title>
+
+    <style>
+        /* สไตล์สำหรับ Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+
+<body>
+    <h1>localStorage Manager</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="dataBody"></tbody>
+    </table>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content" id="modal-content">
+            <h2>Edit Data</h2>
+            <textarea id="newData" rows="20" cols="100"></textarea>
+            <br>
+            <button id="updateButton">Update</button>
+            <button onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <h2>Add Data</h2>
+    <input type="text" id="dataName" placeholder="Name">
+    <button onclick="addData()">Add</button>
+
+    <script>
+        document.getElementById('updateButton').onclick = function() {
+            updateData(dataName);
+        };
+
+        function loadTable() {
+            const dataBody = document.getElementById('dataBody');
+            dataBody.innerHTML = '';
+
+            // ดึงข้อมูลจาก localStorage และแสดงในตาราง
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                const value = localStorage.getItem(key);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${i + 1}</td>
+                    <td>${key}</td>
+                    <td>
+                        <button onclick="editData('${key}')">Edit</button>
+                        <button onclick="deleteData('${key}')">Delete</button>
+                    </td>
+                `;
+
+                dataBody.appendChild(row);
+            }
+        }
+
+        function addData() {
+            const dataName = document.getElementById('dataName').value;
+            if (dataName.trim() !== '') {
+                localStorage.setItem(dataName, '');
+                document.getElementById('dataName').value = '';
+                loadTable();
+            }
+        }
+
+        // รหัส JavaScript สำหรับแสดง Modal และแก้ไขข้อมูล
+        function editData(dataName) {
+            const oldData = localStorage.getItem(dataName);
+            const newDataTextArea = document.getElementById('newData');
+            const modal = document.getElementById('myModal');
+
+            // ถ้าข้อมูลมีอยู่
+            if (oldData !== null) {
+                // กำหนดข้อมูลเดิมใน textarea
+                newDataTextArea.value = oldData;
+
+                // แสดง Modal
+                modal.style.display = 'block';
+
+                // เมื่อผู้ใช้คลิกปุ่ม "Update" ให้เรียกใช้ updateData(dataName)
+                document.getElementById('updateButton').onclick = function() {
+                    updateData(dataName);
+                };
+            }
+        }
+
+        function updateData(dataName) {
+            const newData = document.getElementById('newData').value;
+
+            if (newData !== '') {
+                localStorage.setItem(dataName, newData);
+                loadTable();
+                closeModal();
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('myModal');
+            modal.style.display = 'none';
+        }
+
+        function deleteData(dataName) {
+            localStorage.removeItem(dataName);
+            loadTable();
+        }
+
+        loadTable();
+    </script>
+</body>
+
+</html>
