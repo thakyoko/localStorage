@@ -127,21 +127,10 @@
             // When the user clicks the "Update" button, update the data
             document.getElementById('updateButton').onclick = function () {
                 const updatedData = newDataTextArea.value;
-                if (isJson) {
-                    try {
-                        // Try to parse the updated data as JSON
-                        const parsedData = JSON.parse(updatedData);
-                        localStorage.setItem(dataName, JSON.stringify(parsedData));
-                        loadTable();
-                        closeModal();
-                    } catch (error) {
-                        alert('Invalid JSON format. Please enter valid JSON.');
-                    }
-                } else {
-                    localStorage.setItem(dataName, updatedData);
-                    loadTable();
-                    closeModal();
-                }
+                //Always fix updates The data may not be json
+                localStorage.setItem(dataName, updatedData);
+                loadTable();
+                closeModal();
             };
         }
 
