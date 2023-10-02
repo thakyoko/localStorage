@@ -3,8 +3,6 @@
 
 <head>
     <meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="version" content="1.0"> <!-- เพิ่ม meta tag เพื่อระบุเวอร์ชัน -->
     <title>localStorage Manager</title>
 
     <style>
@@ -64,7 +62,7 @@
     <button onclick="addData()">Add</button>
 
     <script>
-        document.getElementById('updateButton').onclick = function() {
+        document.getElementById('updateButton').onclick = function () {
             updateData(dataName);
         };
 
@@ -106,19 +104,45 @@
             const newDataTextArea = document.getElementById('newData');
             const modal = document.getElementById('myModal');
 
-            // ถ้าข้อมูลมีอยู่
-            if (oldData !== null) {
-                // กำหนดข้อมูลเดิมใน textarea
-                newDataTextArea.value = oldData;
-
-                // แสดง Modal
-                modal.style.display = 'block';
-
-                // เมื่อผู้ใช้คลิกปุ่ม "Update" ให้เรียกใช้ updateData(dataName)
-                document.getElementById('updateButton').onclick = function() {
-                    updateData(dataName);
-                };
+            // Check if the data is a JSON string
+            let jsonData;
+            let isJson = false;
+            try {
+                jsonData = JSON.parse(oldData);
+                isJson = true;
+            } catch (error) {
+                // Not a JSON string
             }
+
+            // If it's a JSON string, display pretty-printed JSON
+            if (isJson) {
+                newDataTextArea.value = JSON.stringify(jsonData, null, 4);
+            } else {
+                newDataTextArea.value = oldData;
+            }
+
+            // Show the Modal
+            modal.style.display = 'block';
+
+            // When the user clicks the "Update" button, update the data
+            document.getElementById('updateButton').onclick = function () {
+                const updatedData = newDataTextArea.value;
+                if (isJson) {
+                    try {
+                        // Try to parse the updated data as JSON
+                        const parsedData = JSON.parse(updatedData);
+                        localStorage.setItem(dataName, JSON.stringify(parsedData));
+                        loadTable();
+                        closeModal();
+                    } catch (error) {
+                        alert('Invalid JSON format. Please enter valid JSON.');
+                    }
+                } else {
+                    localStorage.setItem(dataName, updatedData);
+                    loadTable();
+                    closeModal();
+                }
+            };
         }
 
         function updateData(dataName) {
